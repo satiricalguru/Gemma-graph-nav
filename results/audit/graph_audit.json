@@ -1,0 +1,30 @@
+{
+  "n_tasks": 129,
+  "tasks_module_level_only": 7,
+  "gold_symbols": 499,
+  "gold_symbols_present_in_official_graph": 448,
+  "tasks_with_no_anchor": 65,
+  "hop_distance_histogram": {
+    "0": 45,
+    "1": 34,
+    "2": 18,
+    "3": 24,
+    "4": 22,
+    "5": 17,
+    "6": 11,
+    "7": 22,
+    "8": 19,
+    "unreachable(>8) or no anchor": 236
+  },
+  "official_edge_types_total": {
+    "calls": 457324
+  },
+  "rebuilt_mean_node_jaccard": 0.2773957409519707,
+  "rebuilt_mean_edge_recovery": 0.13382089025236835,
+  "per_repo_tasks": {
+    "fastapi/fastapi": 67,
+    "psf/requests": 13,
+    "Textualize/rich": 48,
+    "encode/httpx": 1
+  }
+}

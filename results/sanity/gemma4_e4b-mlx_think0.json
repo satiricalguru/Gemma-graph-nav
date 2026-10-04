@@ -1,0 +1,76 @@
+{
+  "model": "gemma4:e4b-mlx",
+  "num_ctx": 32768,
+  "temperature": 0.0,
+  "seed": 1234,
+  "think": false,
+  "passed": 5,
+  "total": 5,
+  "total_wall_s": 182.2,
+  "results": [
+    {
+      "probe": "repo_structure",
+      "pass": true,
+      "wall_s": 26.73,
+      "prompt_tokens": 284,
+      "completion_tokens": 7,
+      "gen_tok_per_s": 17.4,
+      "answer": "shop/billing/tax.py"
+    },
+    {
+      "probe": "tool_use",
+      "pass": true,
+      "wall_s": 2.15,
+      "prompt_tokens": 212,
+      "completion_tokens": 7,
+      "gen_tok_per_s": 19.2,
+      "first_call": {
+        "index": 0,
+        "name": "find_symbol",
+        "arguments": {
+          "name": "apply_discount"
+        }
+      },
+      "answer": "shop/orders/cart.py"
+    },
+    {
+      "probe": "code_reasoning",
+      "pass": true,
+      "wall_s": 10.53,
+      "prompt_tokens": 125,
+      "completion_tokens": 374,
+      "gen_tok_per_s": 37.1,
+      "gold": [
+        4,
+        5,
+        5
+      ],
+      "got": [
+        4,
+        5,
+        5
+      ]
+    },
+    {
+      "probe": "patch",
+      "pass": true,
+      "wall_s": 4.09,
+      "prompt_tokens": 228,
+      "completion_tokens": 124,
+      "gen_tok_per_s": 37.5,
+      "applied": true,
+      "apply_err": ""
+    },
+    {
+      "probe": "long_context",
+      "pass": true,
+      "wall_s": 138.16,
+      "prompt_tokens": 31695,
+      "completion_tokens": 119,
+      "gen_tok_per_s": 9.9,
+      "gold": 90569,
+      "got": 90569,
+      "approx_code_tokens": 20019
+    }
+  ]
+}

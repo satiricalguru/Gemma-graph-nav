@@ -1,0 +1,21 @@
+{
+  "method": "apn",
+  "args": {
+    "method": "apn",
+    "budget": 8,
+    "tau": 0.85,
+    "hops": 1,
+    "apn": "{}",
+    "no_containment": false,
+    "repos": "",
+    "limit": 0,
+    "bm25_search": false,
+    "tag": ""
+  },
+  "git_commit": "38079617b5e4b9ccd55929ea5a63e0934281a08a",
+  "prompt_version": "v1",
+  "started_utc": "2026-10-04T05:37:53Z",
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "tasks_sha256": "e4b3fd60f69dbc2b9213e54eeb9636db78aefe92c1d06269d73d9f5f8f3c8ad6"
+}

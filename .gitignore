@@ -1,0 +1,11 @@
+data/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+kaggle/kernel_31b/run_31b.py
+results/runs/**/tasks.jsonl
+results/runs_discarded/
+results/*.err
+results/queue_main.log
+results/runs_discarded/

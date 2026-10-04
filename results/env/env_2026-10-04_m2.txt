@@ -1,0 +1,50 @@
+date_utc: 2026-10-04T04:41:49Z
+chip: Apple M2
+mem_bytes: 17179869184
+cpu_cores: 8
+gpu: Apple M2 8 
+macos: 27.0.1 (26A434)
+python: Python 3.14.2
+ollama_server: {"version":"0.35.0"}
+--- ollama show gemma4:12b-it-qat
+  Model
+    architecture        gemma4    
+    parameters          11.9B     
+    context length      262144    
+    embedding length    3840      
+    quantization        Q4_0      
+    requires            0.30.5    
+
+  Capabilities
+    completion     
+    vision         
+    audio          
+    tools          
+    thinking       
+        levels     false, true    
+        default    true           
+
+  Projector
+    architecture        clip      
+    parameters          52.38M    
+    embedding length    3840      
+    dimensions          3840      
+
+  Parameters
+    top_k          64      
+    top_p          0.95    
+    temperature    1       
+
+  License
+    Apache License               
+    Version 2.0, January 2004    
+    ...                          
+
+--- ollama list
+NAME                 ID              SIZE      MODIFIED       
+gemma4:12b-it-qat    38044be4f923    7.2 GB    19 minutes ago    
+gemma4:e4b-mlx       5a08735df03c    9.5 GB    5 weeks ago       
+ornith:9b            a75697c14589    5.6 GB    6 weeks ago       
+--- ollama ps
+NAME                 ID              SIZE      PROCESSOR    CONTEXT    UNTIL               
+gemma4:12b-it-qat    38044be4f923    8.0 GB    100% GPU     32768      29 minutes from now    

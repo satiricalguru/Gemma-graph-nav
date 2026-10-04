@@ -1,0 +1,45 @@
+{
+  "method": "gdn",
+  "args": {
+    "method": "gdn",
+    "budget": 4,
+    "tau": 0.85,
+    "hops": 1,
+    "apn": "{}",
+    "no_containment": false,
+    "repos": "",
+    "limit": 0,
+    "bm25_search": false,
+    "tag": "",
+    "cv": true
+  },
+  "git_commit": "948ff8610680076395f4dfdaaaa5b316dae729b5",
+  "prompt_version": "v1",
+  "started_utc": "2026-10-04T11:31:05Z",
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "tasks_sha256": "e4b3fd60f69dbc2b9213e54eeb9636db78aefe92c1d06269d73d9f5f8f3c8ad6",
+  "model": {
+    "backend": "ollama",
+    "name": "gemma4:e4b-it-qat",
+    "host": "http://localhost:11434",
+    "num_ctx": 16384,
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "seed": 1234,
+    "num_predict": 2048,
+    "think": false,
+    "keep_alive": "30m"
+  },
+  "ollama_version": "0.35.1",
+  "model_details": {
+    "parent_model": "",
+    "format": "gguf",
+    "family": "gemma4",
+    "families": [
+      "gemma4"
+    ],
+    "parameter_size": "7.5B",
+    "quantization_level": "Q4_0"
+  }
+}

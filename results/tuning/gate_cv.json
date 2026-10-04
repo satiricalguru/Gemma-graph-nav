@@ -1,0 +1,23 @@
+{
+  "n": 122,
+  "apn_failure_rate": 0.5901639344262295,
+  "auroc_uncertainty": 0.6433333333333333,
+  "auroc_no_anchor": 0.6725,
+  "tau": {
+    "fastapi": {
+      "tau": 0.8176221434351634,
+      "train_J": 0.49038461538461536,
+      "heldout_gate_open_rate": 0.46875
+    },
+    "requests+httpx": {
+      "tau": 0.8033349098911675,
+      "train_J": 0.2996376811594203,
+      "heldout_gate_open_rate": 0.3076923076923077
+    },
+    "rich": {
+      "tau": 0.8033349098911675,
+      "train_J": 0.3105335157318741,
+      "heldout_gate_open_rate": 0.7777777777777778
+    }
+  }
+}

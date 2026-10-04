@@ -1,0 +1,24 @@
+# Model configuration. Every field can be overridden by an environment variable
+# (shown in brackets) so experiments are never hard-coded to one model.
+#
+# Local default chosen in docs/ENVIRONMENT.md: Gemma 4 12B QAT on an Apple M2 / 16 GB.
+
+[model]
+backend = "ollama"                 # [GGD_BACKEND]   only "ollama" implemented so far
+name = "gemma4:12b-it-qat"         # [GGD_MODEL]     exact Ollama tag
+host = "http://localhost:11434"    # [GGD_OLLAMA_HOST]
+
+[inference]
+num_ctx = 32768                    # [GGD_NUM_CTX]   context window actually allocated
+temperature = 0.0                  # [GGD_TEMPERATURE]
+top_p = 1.0
+seed = 1234                        # [GGD_SEED]
+num_predict = 2048                 # max generated tokens per call
+think = false                      # [GGD_THINK]     Gemma 4 thinking mode on/off
+keep_alive = "30m"
+
+# Scale ladder used by the delegation study (see docs/RESEARCH_DESIGN.md §5).
+# local = runs on the development Mac; kaggle = Kaggle L4x4 (96 GB) notebook.
+[ladder]
+local  = ["gemma4:e2b-it-qat", "gemma4:e4b-it-qat", "gemma4:12b-it-qat"]
+kaggle = ["gemma4:26b-a4b-it-qat", "gemma-4-31b-it-qat-w4a16-ct"]

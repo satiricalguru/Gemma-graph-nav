@@ -1,0 +1,22 @@
+{
+  "id": "satiricalguru/ggd-delegation-gemma4-31b",
+  "title": "ggd-delegation-gemma4-31b",
+  "code_file": "run_31b.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": false,
+  "dataset_sources": [
+    "metric/gemma-4-developer-agent-wheelhouse"
+  ],
+  "competition_sources": [
+    "gemma-4-developer-agent"
+  ],
+  "model_sources": [
+    "google/gemma-4/Other/gemma-4-31b-it-qat-w4a16-ct/2"
+  ],
+  "kernel_sources": [],
+  "machine_shape": "NvidiaL4"
+}
