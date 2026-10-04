@@ -3,7 +3,7 @@
 
 ## Abstract
 
-Repository-level coding agents increasingly navigate code graphs with LLM-driven tools. Every published system lets the model drive and evaluates one scaffold at large scale, so it is unknown whether *small* local models should navigate at all. We run a controlled study on the official Gemma 4 Developer Agent graphs (122 Python issues from fastapi, rich, requests and httpx). All methods share the same graph, anchors, candidate set and output format. We compare: (i) a zero-LLM algorithmic navigator (personalized PageRank seeded from issue identifiers, APN); (ii) Gemma navigating the same graph with the competition's own tool semantics (MDN); (iii) gated delegation (GDN), which runs APN and calls the LLM navigator only when APN's ranking is uncertain; and four other baselines. With Gemma 4 E2B and E4B on an Apple M2 (16 GB), our pre-registered hypothesis that the algorithm beats the small model was **not** supported: {{H1_SENTENCE}} The aggregate hides a sharp interaction. When the issue names a symbol present in the graph, model-driven navigation beats APN (E2B: +0.067 Recall@5); when it does not, the model does worse than APN (−0.037). GDN reached the highest Recall@5 for E2B (0.328 vs. 0.293 for APN) while invoking the LLM on 57% of tasks and halving MDN's wall time. A graph audit shows that half the official tasks contain no identifier matching any graph node, which bounds what any anchored graph method can do. The uncertainty signal itself was a weak failure predictor (AUROC 0.64, below our pre-registered 0.65 bar). All code, prompts, per-task logs and statistics are released (Apache-2.0).
+Repository-level coding agents increasingly navigate code graphs with LLM-driven tools. Every published system lets the model drive and evaluates one scaffold at large scale, so it is unknown whether *small* local models should navigate at all. We run a controlled study on the official Gemma 4 Developer Agent graphs (122 Python issues from fastapi, rich, requests and httpx). All methods share the same graph, anchors, candidate set and output format. We compare: (i) a zero-LLM algorithmic navigator (personalized PageRank seeded from issue identifiers, APN); (ii) Gemma navigating the same graph with the competition's own tool semantics (MDN); (iii) gated delegation (GDN), which runs APN and calls the LLM navigator only when APN's ranking is uncertain; and four other baselines. With Gemma 4 E2B and E4B on an Apple M2 (16 GB), our pre-registered hypothesis that the algorithm beats the small model was **not** supported; model-driven navigation was at or above APN at both scales (Recall@5 +0.017 for E2B and +0.028 for E4B, CIs including zero). The aggregate hides a sharp interaction. When the issue names a symbol present in the graph, model-driven navigation beats APN (E4B: +0.095 Recall@5, 95% CI +0.019 to +0.179); when it does not, the model does worse than APN (E4B: −0.042). GDN reached the highest Recall@5 (E2B 0.328, E4B 0.323, vs. 0.293 for APN), invoked the LLM on 57% of tasks, and at E4B used 57% fewer prefill tokens than MDN. No difference survives Holm correction. A graph audit shows that half the official tasks contain no identifier matching any graph node, which bounds what any anchored graph method can do. The uncertainty signal itself was a weak failure predictor (AUROC 0.64, below our pre-registered 0.65 bar). All code, prompts, per-task logs and statistics are released (Apache-2.0).
 
 ## 1. Introduction
 
@@ -20,7 +20,7 @@ We ask: **for a fixed code graph, how should navigation be split between an algo
 **Contributions.**
 (1) A controlled delegation study that holds graph, tools, anchors, candidates and budgets fixed across six methods and multiple Gemma 4 scales, with repo-held-out tuning and paired, repo-clustered statistics.
 (2) An empirical finding: small-model navigation helps only when the issue provides an anchor in the graph. This suggests routing on *anchor availability*, not on model size alone.
-(3) Gated delegation, a training-free policy that achieved the highest Recall@5 at E2B at half of MDN's cost. Its gate signal underperformed the pre-registered bar, and we report this openly.
+(3) Gated delegation, a training-free policy that achieved the highest Recall@5 at both scales, at roughly half of MDN's cost at E4B. Its gate signal underperformed the pre-registered bar, and we report this openly.
 (4) An audit of the official competition graph (gold coverage, anchor availability, hop distances) that any participant can use as a ceiling estimate.
 
 We report hypotheses that failed (H1 at E2B, H3) alongside those that held.
@@ -57,7 +57,7 @@ We report hypotheses that failed (H1 at E2B, H3) alongside those that held.
 | Metrics | Function-level Recall@k (share of gold symbols in top-k), Acc@5 (all gold in top-5), LLM calls, tool calls, invalid calls, wall time |
 | Statistics | Paired per task vs. APN-CV; 10k-resample bootstrap clustered by repository; exact McNemar on Acc@5; Holm correction across comparisons |
 
-**Not run.** The 12B model (cut for time and storage after an MLX build of E4B exhausted memory; see the experiment log), 31B on Kaggle L4×4 ({{KAGGLE_STATUS}}), downstream repair (H4), and the external-benchmark generalization experiment. No numbers are reported for these.
+**Not run.** The 12B model (cut for time and storage after an MLX build of E4B exhausted memory; see the experiment log), 31B on Kaggle L4×4 (the kernel was prepared and pushed but never left Kaggle's L4×4 queue before submission), downstream repair (H4), and the external-benchmark generalization experiment. No numbers are reported for these.
 
 ## 5. Results
 
@@ -65,21 +65,33 @@ We report hypotheses that failed (H1 at E2B, H3) alongside those that held.
 
 **Table 1.** Localization on 122 tasks (single run, T = 0). Δ is paired versus APN-CV with a 95% repo-clustered bootstrap CI.
 
-{{TABLE1}}
+| Method | Model | R@1 | R@5 | Acc@5 | LLM calls | Tool calls | Prefill tok. | s/task | ΔR@5 vs APN-CV [95% CI] |
+|---|---|---|---|---|---|---|---|---|---|
+| BM25 | – | .071 | .280 | .221 | 0 | 0 | 0 | ~0 | −.013 [−.090, +.042] |
+| Static 1-hop graph | – | .071 | .280 | .221 | 0 | 0 | 0 | ~0 | −.013 [−.090, +.042] |
+| **APN-CV** (no LLM) | – | .125 | .293 | .238 | 0 | 0 | 0 | ~0 | reference |
+| No retrieval | E2B | .059 | .264 | .205 | 1.0 | 0 | 3,838 | 15.8 | −.029 [−.121, +.029] |
+| Agentless-style | E2B | .083 | .239 | .197 | 2.0 | 0 | 6,630 | 29.0 | −.053 [−.243, +.011] |
+| MDN | E2B | .168 | .309 | .254 | 2.3 | 1.2 | 1,971 | 12.6 | +.017 [−.067, +.063] |
+| **GDN** | E2B | .170 | **.328** | .271 | 1.3 | 0.8 | 1,499 | 5.5 | +.035 [+.000, +.071] |
+| MDN | E4B | **.196** | .321 | **.279** | 6.2 | 4.5 | 8,728 | 75.1 | +.028 [−.045, +.119] |
+| **GDN** | E4B | .186 | .323 | .262 | 2.5 | 1.8 | 3,777 | 41.4 | +.031 [+.000, +.083] |
 
-**H1 (algorithm beats small model): not supported.** {{H1_PARAGRAPH}}
+After Holm correction across all comparisons, no method differs significantly from APN-CV (all adjusted p ≥ 0.9; Acc@5 McNemar wins/losses: GDN-E2B 4/0, GDN-E4B 3/0, MDN-E4B 8/3).
 
-**The anchor interaction.** Splitting tasks by whether any issue identifier matches a graph node (63 anchored, 59 not) explains the aggregate (Fig. 2). For E2B on anchored tasks, MDN beats APN by +0.067 R@5 (95% CI −0.003 to +0.144). On un-anchored tasks it trails APN by −0.037 (−0.092 to +0.003). {{E4B_ANCHOR_SENTENCE}} The model is useful as a *local verifier around a foothold*, not as a searcher from scratch.
+**H1 (algorithm beats small model): not supported.** MDN is at or above APN at both scales, so the pre-registered prediction fails at its first clause. Scale helps the navigator where it matters most: E4B raises R@1 from 0.168 to 0.196 and Acc@5 from 0.254 to 0.279 over E2B, while APN stays at 0.125 / 0.238. With 122 tasks and one run per configuration, none of these differences survives multiple-comparison correction, so we read them as directional.
+
+**The anchor interaction.** Splitting tasks by whether any issue identifier matches a graph node (63 anchored, 59 not) explains the aggregate (Fig. 2). For E2B on anchored tasks, MDN beats APN by +0.067 R@5 (95% CI −0.003 to +0.144). On un-anchored tasks it trails APN by −0.037 (−0.092 to +0.003). The interaction grows with scale: E4B MDN gains +0.095 on anchored tasks (95% CI +0.019 to +0.179, the only interval clear of zero among the navigation comparisons) and still trails APN on un-anchored tasks (−0.042). The model is useful as a *local verifier around a foothold*, not as a searcher from scratch.
 
 ![MDN/GDN minus APN by anchor status](figures/fig2_anchor_split.png)
 
-**H2 (gated delegation).** {{H2_PARAGRAPH}}
+**H2 (gated delegation).** GDN is non-inferior to the better of APN and MDN at both scales (E2B 0.328 vs. max 0.309; E4B 0.323 vs. 0.321; margin 3 pp), and its CI versus APN excludes negative values. The token criterion (≥50% fewer navigation tokens than MDN) holds for E4B (prefill −57%, context −50%, wall time −45%) but **not for E2B** (prefill −24%), because E2B MDN rarely navigates in the first place. H2 is therefore partially supported. The gate opened on 57% of tasks for both models; for anchored tasks it opened on only 10 of 63, which is why E2B and E4B GDN have identical anchored-task Recall@5 (different rankings, same gold hits).
 
 **H3 (gate validity): falsified.** APN's normalized score entropy predicts APN failure (R@5 = 0) with AUROC 0.643, below the pre-registered 0.65. The binary "no anchor matched" signal does better (0.673). Combined with the interaction above, this points to a simpler and better-motivated gate: *let the model navigate when the issue anchors it*.
 
 **Memorization probe.** With only the issue and a module list, E2B reaches R@5 = 0.264, close to BM25 (0.280). Prior exposure to these public repositories therefore does not explain the navigation results, though it may inflate all LLM methods equally. The hidden competition test set uses private repositories.
 
-**Efficiency.** {{EFFICIENCY_PARAGRAPH}}
+**Efficiency.** APN costs milliseconds and no tokens. Among LLM methods, GDN-E2B is the cheapest (1.3 calls, 5.5 s/task on an M2) and the most accurate at R@5. E4B MDN costs 13.7× the wall time of GDN-E2B for higher R@1 and Acc@5 but lower R@5. The efficient frontier on this hardware is APN → GDN-E2B → MDN-E4B (best R@1/Acc@5).
 
 ## 6. Ablations and the graph audit
 
@@ -91,7 +103,7 @@ We report hypotheses that failed (H1 at E2B, H3) alongside those that held.
 
 ## 7. Failure analysis
 
-Failures are labelled automatically from logs for tasks with R@5 = 0. For E2B MDN, the most common causes are a wrong start without an anchor (25), never reaching gold despite an anchor (20), an empty or missing `FINAL` (17), tool misuse (4), and gold absent from the graph (5). Behaviourally, **E2B issued no tool call at all on 59% of MDN tasks**; it answered from the issue and anchors alone. 27% of its tool calls were invalid, mostly non-existent node ids and invented edge types such as `"incoming"`. {{E4B_BEHAVIOUR}} Typical example: on `fastapi_15030`, E4B spent 7 calls on neighbour expansion from `FastAPI` and ended with an empty list. This is over-expansion without a foothold, the regime where APN does better.
+Failures are labelled automatically from logs for tasks with R@5 = 0. For E2B MDN, the most common causes are a wrong start without an anchor (25), never reaching gold despite an anchor (20), an empty or missing `FINAL` (17), tool misuse (4), and gold absent from the graph (5). Behaviourally, **E2B issued no tool call at all on 59% of MDN tasks**; it answered from the issue and anchors alone. 27% of its tool calls were invalid, mostly non-existent node ids and invented edge types such as `"incoming"`. E4B behaves very differently: it calls tools on 93% of tasks (4.5 calls on average), with an invalid-call rate of 10%; its dominant failure is a wrong start without an anchor (32) followed by budget exhaustion or an empty FINAL (22). Typical example: on `fastapi_15030`, E4B spent 7 calls on neighbour expansion from `FastAPI` and ended with an empty list. This is over-expansion without a foothold, the regime where APN does better.
 
 ## 8. Discussion
 
@@ -99,11 +111,11 @@ For small local agents, the useful question is less "graph or no graph" than "wh
 
 ## 9. Limitations
 
-Single run per configuration (T = 0); no seed variance. Only E2B and E4B were run; claims about scale beyond 4B are untested, and H1's "gap shrinks with scale" clause cannot be assessed. 122 tasks drawn mostly from two repositories; the requests+httpx fold has 14 tasks. Localization only; no repair (H4 not run). `view_symbol` replaces `read_file`. Recall@5 counts symbols; partial credit on multi-symbol fixes. Gold labels are automatic and may over-count incidental edits. The E4B MLX build was discarded after a memory failure; E4B results use the QAT GGUF build.
+Single run per configuration (T = 0); no seed variance. Only E2B and E4B were run (12B and 31B were prepared but not executed); claims about scale beyond 4B are untested, and H1's "gap shrinks with scale" clause cannot be assessed. 122 tasks drawn mostly from two repositories; the requests+httpx fold has 14 tasks. Localization only; no repair (H4 not run). `view_symbol` replaces `read_file`. Recall@5 counts symbols; partial credit on multi-symbol fixes. Gold labels are automatic and may over-count incidental edits. The E4B MLX build was discarded after a memory failure; E4B results use the QAT GGUF build.
 
 ## 10. Conclusion
 
-We asked who should walk the code graph for a small model. The answer is neither "always the model" nor "always the algorithm". Gemma 4 E2B navigation beats a PageRank navigator when the issue anchors it in the graph and loses when it does not, and a gate that delegates conditionally gave the best E2B localization at half the cost. Our gate's uncertainty signal was weaker than predicted; anchor availability is the better switch. Code, logs and the pre-registration are public, and every number here regenerates from `scripts/make_tables.py`.
+We asked who should walk the code graph for a small model. The answer is neither "always the model" nor "always the algorithm". Gemma 4 E2B/E4B navigation beats a PageRank navigator when the issue anchors it in the graph (significantly so for E4B) and loses when it does not, and a gate that delegates conditionally gave the best Recall@5 at both scales at up to half the cost. Our gate's uncertainty signal was weaker than predicted; anchor availability is the better switch. Code, logs and the pre-registration are public, and every number here regenerates from `scripts/make_tables.py`.
 
 ## References
 [1] Ouyang et al. RepoGraph. ICLR 2025, arXiv:2410.14684. [2] Liu et al. CodexGraph. arXiv:2408.03910. [3] Chen et al. LocAgent. ACL 2025, arXiv:2503.09089. [4] Seddik et al. ARISE. arXiv:2605.03117. [5] Tao et al. Code Graph Model. NeurIPS 2025, arXiv:2505.16901. [6] Zhang et al. One Tool Is Enough (RepoNavigator). arXiv:2512.20957. [7] Jiang et al. CoSIL. arXiv:2503.22424. [8] Yu et al. OrcaLoca. ICML 2025, arXiv:2502.00350. [9] GraphLocator. FSE 2026, arXiv:2512.22469. [10] Hu et al. LARGER. arXiv:2605.16352. [11] Zhang et al. RepoAtlas. arXiv:2609.16936. [12] Volpini & Raad. RLM-on-KG. arXiv:2604.17056. [13] Kon et al. SWE-Protégé. arXiv:2602.22124. [14] Lindenbauer et al. The Complexity Trap. arXiv:2508.21433. [15] Fan et al. Harness Design for Coding Agents. arXiv:2609.20804. [16] Xia et al. Agentless. arXiv:2407.01489. [17] Jimenez et al. SWE-bench. ICLR 2024, arXiv:2310.06770. [18] Markowitz et al. Google – The Gemma 4 Developer Agent Paper Track. Kaggle, 2026.

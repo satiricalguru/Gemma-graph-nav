@@ -13,7 +13,7 @@
       "stop_reasons": {
         "done": 122
       },
-      "tool_mix": {}
+      "tool_mix": "see private logs"
     },
     "slices": {
       "anchored": {
@@ -59,11 +59,7 @@
         "invalid_calls": 1,
         "final_empty": 1
       },
-      "tool_mix": {
-        "search_similar_code": 17,
-        "get_code_neighbors": 27,
-        "view_symbol": 50
-      }
+      "tool_mix": "see private logs"
     },
     "slices": {
       "anchored": {
@@ -88,6 +84,52 @@
       }
     }
   },
+  "gdn|gemma4_e4b-it-qat": {
+    "failures_R@5=0": {
+      "never_reached_gold": 21,
+      "budget_or_empty_final": 13,
+      "visited_gold_but_not_ranked": 1,
+      "gold_not_in_graph": 5,
+      "no_anchor_wrong_start": 23,
+      "tool_misuse": 3
+    },
+    "n_fail": 66,
+    "behaviour": {
+      "zero_tool_call_rate": 0.45901639344262296,
+      "mean_tool_calls": 1.8442622950819672,
+      "invalid_call_rate": 0.12,
+      "stop_reasons": {
+        "done": 53,
+        "budget": 14,
+        "final": 50,
+        "final_empty": 4,
+        "invalid_calls": 1
+      },
+      "tool_mix": "see private logs"
+    },
+    "slices": {
+      "anchored": {
+        "n": 63,
+        "R@5": 0.45660555970276345,
+        "APN_R@5": 0.4195685226657265,
+        "delta_vs_apn": 0.03703703703703704,
+        "ci95": [
+          0.0,
+          0.08465608465608465
+        ]
+      },
+      "no_anchor": {
+        "n": 59,
+        "R@5": 0.18117616846430407,
+        "APN_R@5": 0.15716486902927582,
+        "delta_vs_apn": 0.02401129943502825,
+        "ci95": [
+          -0.012711864406779662,
+          0.07062146892655367
+        ]
+      }
+    }
+  },
   "mdn|gemma4_e2b-it-qat": {
     "failures_R@5=0": {
       "never_reached_gold": 20,
@@ -107,11 +149,7 @@
         "invalid_calls": 3,
         "budget": 1
       },
-      "tool_mix": {
-        "search_similar_code": 49,
-        "view_symbol": 49,
-        "get_code_neighbors": 51
-      }
+      "tool_mix": "see private logs"
     },
     "slices": {
       "anchored": {
@@ -138,42 +176,43 @@
   },
   "mdn|gemma4_e4b-it-qat": {
     "failures_R@5=0": {
-      "never_reached_gold": 1,
-      "budget_or_empty_final": 1
+      "never_reached_gold": 11,
+      "budget_or_empty_final": 22,
+      "no_anchor_wrong_start": 32,
+      "gold_not_in_graph": 5
     },
-    "n_fail": 2,
+    "n_fail": 70,
     "behaviour": {
-      "zero_tool_call_rate": 0.0,
-      "mean_tool_calls": 1.0,
-      "invalid_call_rate": 0.0,
+      "zero_tool_call_rate": 0.07377049180327869,
+      "mean_tool_calls": 4.459016393442623,
+      "invalid_call_rate": 0.10294117647058823,
       "stop_reasons": {
-        "final": 1,
-        "final_empty": 1
+        "final": 90,
+        "final_empty": 21,
+        "budget": 10,
+        "invalid_calls": 1
       },
-      "tool_mix": {
-        "get_code_neighbors": 1,
-        "search_similar_code": 1
-      }
+      "tool_mix": "see private logs"
     },
     "slices": {
       "anchored": {
-        "n": 1,
-        "R@5": 0.0,
-        "APN_R@5": 0.0,
-        "delta_vs_apn": 0.0,
+        "n": 63,
+        "R@5": 0.5144313274257402,
+        "APN_R@5": 0.4195685226657265,
+        "delta_vs_apn": 0.09486280476001371,
         "ci95": [
-          0.0,
-          0.0
+          0.018636096413874193,
+          0.17940131152074268
         ]
       },
       "no_anchor": {
-        "n": 1,
-        "R@5": 0.0,
-        "APN_R@5": 0.0,
-        "delta_vs_apn": 0.0,
+        "n": 59,
+        "R@5": 0.1147919876733436,
+        "APN_R@5": 0.15716486902927582,
+        "delta_vs_apn": -0.0423728813559322,
         "ci95": [
-          0.0,
-          0.0
+          -0.11440677966101695,
+          0.022598870056497175
         ]
       }
     }
@@ -192,7 +231,7 @@
       "stop_reasons": {
         "done": 122
       },
-      "tool_mix": {}
+      "tool_mix": "see private logs"
     },
     "slices": {
       "anchored": {

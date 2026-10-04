@@ -18,3 +18,5 @@ Append-only. Each entry: date (UTC), what was run, exact config, where (LOCAL-MA
 | 2026-10-04 | E2 31B kernel pushed (mdn, gdn, no_retrieval, agentless) | KAGGLE L4x4 | gemma-4-31b-it-qat-w4a16-ct (W4A16), vLLM | scripts/make_kaggle_kernel.py | kaggle output results_31b.tgz | queued |
 | 2026-10-04 | Scope change (user decision): 12B runs limited to mdn+gdn; no_retrieval/agentless baselines only for e2b, e4b (and 31B on Kaggle) | — | — | — | — | — |
 | 2026-10-04 | e4b-mlx (MLX engine) reserved 18 GB at ctx 16384 -> swap filled disk; partial e4b-mlx runs moved to results/runs_discarded. E4B point switched to gemma4:e4b-it-qat. Scope cut (user, time/storage): E4B mdn+gdn only; local 12B dropped | LOCAL-MAC | — | — | — | — |
+| 2026-10-04 | E1 E4B mdn+gdn complete (122 tasks each) | LOCAL-MAC | gemma4:e4b-it-qat Q4 QAT | T=0, seed 1234, ctx 16384, think off | results/runs/{mdn,gdn}/gemma4_e4b-it-qat | MDN R@5 .321, GDN .323 |
+| 2026-10-04 | 31B Kaggle kernel: never left L4x4 queue; skipped (user decision). 12B: not run (user decision) | PLANNED/NOT RUN | — | — | — | no results |
