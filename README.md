@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧭 gemma-graph-nav
+# Gemma-graph-nav
 
 ### Should a small LLM navigate your code graph, or should the graph navigate for it?
 
