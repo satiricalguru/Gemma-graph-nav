@@ -16,7 +16,18 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "paper" / "figures"
 OUT.mkdir(parents=True, exist_ok=True)
 sys.path.insert(0, str(ROOT / "src"))
-INK, MUTED, GRID = "#1f2328", "#57606a", "#d0d7de"
+THEMES = {"light": {"ink": "#1f2328", "muted": "#57606a", "grid": "#d0d7de", "bg": "#ffffff"},
+          "dark": {"ink": "#e6edf3", "muted": "#9198a1", "grid": "#30363d", "bg": "#0d1117"}}
+INK, MUTED, GRID, BG = (THEMES["light"][k] for k in ("ink", "muted", "grid", "bg"))
+SUFFIX = ""
+
+
+def set_theme(name):
+    global INK, MUTED, GRID, BG, SUFFIX
+    t = THEMES[name]
+    INK, MUTED, GRID, BG, SUFFIX = t["ink"], t["muted"], t["grid"], t["bg"], ("" if name == "light" else "_dark")
+    plt.rcParams.update({"figure.facecolor": BG, "axes.facecolor": BG, "savefig.facecolor": BG,
+                         "text.color": INK, "axes.labelcolor": MUTED, "legend.labelcolor": INK})
 COLORS = {"apn_cv": "#0969da", "bm25": "#8c959f", "no_retrieval": "#bf8700",
           "agentless": "#8250df", "mdn": "#cf222e", "gdn": "#1a7f37"}
 LABEL = {"apn_cv": "APN (no LLM)", "bm25": "BM25", "no_retrieval": "No retrieval",
@@ -45,6 +56,8 @@ def style(ax):
     ax.spines["left"].set_color(GRID)
     ax.spines["bottom"].set_color(GRID)
     ax.tick_params(colors=MUTED)
+    for lbl in ax.get_xticklabels() + ax.get_yticklabels():
+        lbl.set_color(MUTED)
     ax.yaxis.grid(True, color=GRID, lw=0.6)
     ax.set_axisbelow(True)
 
@@ -72,7 +85,7 @@ def fig1(models):
     ax.set_ylim(0, 0.55)
     style(ax)
     fig.tight_layout()
-    fig.savefig(OUT / "fig1_main.png")
+    fig.savefig(OUT / f"fig1_main{SUFFIX}.png")
 
 
 def fig2(models):
@@ -98,7 +111,7 @@ def fig2(models):
     ax.set_ylabel("ΔR@5 vs APN\n(solid: anchored, light: no anchor)", color=MUTED, fontsize=8)
     style(ax)
     fig.tight_layout()
-    fig.savefig(OUT / "fig2_anchor_split.png")
+    fig.savefig(OUT / f"fig2_anchor_split{SUFFIX}.png")
 
 
 def fig3():
@@ -111,13 +124,15 @@ def fig3():
     ax.set_ylabel("Gold symbols", color=MUTED)
     style(ax)
     fig.tight_layout()
-    fig.savefig(OUT / "fig3_hops.png")
+    fig.savefig(OUT / f"fig3_hops{SUFFIX}.png")
 
 
 if __name__ == "__main__":
     models = [m for m in ("gemma4_e2b-it-qat", "gemma4_e4b-it-qat", "gemma4_12b-it-qat")
               if (ROOT / "results/runs/mdn" / m).exists()]
-    fig1(models)
-    fig2(models)
-    fig3()
+    for theme in ("light", "dark"):
+        set_theme(theme)
+        fig1(models)
+        fig2(models)
+        fig3()
     print("figures:", sorted(p.name for p in OUT.glob("*.png")))

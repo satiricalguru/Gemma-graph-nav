@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/gemma-color.svg" width="96" alt="Gemma logo">
+
 # Gemma-graph-nav
 
 ### Should a small LLM navigate your code graph, or should the graph navigate for it?
@@ -39,7 +41,12 @@ We held the graph, tools, inputs and budgets fixed and compared **6 localization
 
 ## 📊 Results
 
-<p align="center"><img src="paper/figures/fig1_main.png" width="760" alt="Recall@5 by method and model"></p>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="paper/figures/fig1_main_dark.png">
+    <img src="paper/figures/fig1_main.png" width="760" alt="Recall@5 by method and model">
+  </picture>
+</p>
 
 | Method | Model | R@1 | **R@5** | Acc@5 | LLM calls | s / task |
 |---|---|---:|---:|---:|---:|---:|
@@ -56,13 +63,23 @@ We held the graph, tools, inputs and budgets fixed and compared **6 localization
 
 ### 🎯 It's all about the foothold
 
-<p align="center"><img src="paper/figures/fig2_anchor_split.png" width="760" alt="Gain over the graph algorithm, split by anchor availability"></p>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="paper/figures/fig2_anchor_split_dark.png">
+    <img src="paper/figures/fig2_anchor_split.png" width="760" alt="Gain over the graph algorithm, split by anchor availability">
+  </picture>
+</p>
 
 Solid bars are issues that name a symbol in the graph; light bars are issues that don't. The model is a good **local verifier around a starting point** and a poor **searcher from scratch**.
 
 ### 🕸️ How far is the bug from what the issue mentions?
 
-<p align="center"><img src="paper/figures/fig3_hops.png" width="760" alt="Hop distance from issue anchors to the code that was fixed"></p>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="paper/figures/fig3_hops_dark.png">
+    <img src="paper/figures/fig3_hops.png" width="760" alt="Hop distance from issue anchors to the code that was fixed">
+  </picture>
+</p>
 
 Audit of the official competition graph: 90% of fixed symbols exist as nodes, but only 45 sit exactly where the issue points, and 236 of 499 are unreachable within 8 hops of anything the issue mentions.
 
@@ -135,6 +152,6 @@ tests/          unit tests for labels, graph, ranking, metrics, stats
 
 ## 📜 License and data
 
-Code: **Apache 2.0**. Competition data is **not** included and must not be redistributed; it is downloaded by script into `data/` (git-ignored).
+Code: **Apache 2.0**. Gemma is a trademark of Google LLC; the logo is from [LobeHub Icons](https://github.com/lobehub/lobe-icons) (MIT) and is used only to indicate the model this project is built on. Competition data is **not** included and must not be redistributed; it is downloaded by script into `data/` (git-ignored).
 
 <div align="center"><sub>Built for the Kaggle <i>Google – The Gemma 4 Developer Agent Paper Track</i> · 2026</sub></div>
