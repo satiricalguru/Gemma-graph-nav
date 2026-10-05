@@ -1,6 +1,3 @@
-# Who Should Walk the Graph?
-### Across the Gemma 4 scale ladder, small models navigate code graphs well only from a foothold, gated delegation helps them, and at 31B the model should simply navigate
-
 ## Abstract
 
 Repository-level coding agents increasingly navigate code graphs with LLM-driven tools, but every published system lets the model drive and reports one scaffold at large scale. It is unknown whether small local models should navigate at all. We run a controlled study on the official Gemma 4 Developer Agent graphs (122 Python issues from fastapi, rich, requests and httpx). All methods share the same graph, anchors, candidate set and output format. We compare a zero-LLM navigator (personalized PageRank seeded from issue identifiers, APN), Gemma navigating the same graph with the competition's tool semantics (MDN), gated delegation (GDN: APN first, LLM only when APN is uncertain), and four baselines, at four scales: Gemma 4 E2B, E4B and 12B on an Apple M2 laptop and the competition's 31B model on Kaggle L4×4. Our pre-registered hypothesis that the algorithm beats small models was **not** supported, but its scale clause was. The advantage of model-driven navigation over APN grows from +0.017 (E2B) to +0.028 (E4B) to **+0.110 Recall@5 at 31B** (95% CI +0.041 to +0.188; Acc@5 McNemar 13 wins / 1 loss, Holm-adjusted p ≈ 0.02). Small models help only when the issue names a symbol in the graph (E4B: +0.095 on anchored issues, −0.042 otherwise); at 31B that penalty disappears. GDN gives the best Recall@5 for E2B and E4B at up to 57% fewer tokens than MDN, but loses to MDN at 31B. We also report a harness defect found after the runs: when the tool budget ran out, the final turn carried no explicit instruction, and 12B (118/122 tasks) and 31B (62/122) often replied with nothing, falling back to BM25. Their MDN scores are therefore lower bounds. A graph audit shows half the official issues name no graph symbol at all. Code, prompts, per-task results and statistics are released (Apache-2.0).
@@ -62,7 +59,7 @@ We report failed hypotheses (H1's first clause, H3, H2 at 31B) alongside those t
 
 ## 5. Results
 
-![Recall@5 by method and model](figures/fig1_main.png)
+*Figure 1 (media gallery, image 1): Recall@5 by method and model.*
 
 **Table 1.** Localization on 122 tasks (single run, T = 0). Δ is paired versus APN-CV with a 95% repo-clustered bootstrap CI. Wall time is hardware-specific (M2 for E2B/E4B/12B, L4×4 for 31B). † = most MDN runs ended at the tool budget with an empty reply (see §7); a lower bound.
 
@@ -89,7 +86,7 @@ On Acc@5, two comparisons survive Holm correction: 31B MDN (13 wins / 1 loss vs.
 
 **The foothold interaction.** Splitting tasks by whether any issue identifier matches a graph node (63 anchored, 59 not) explains the small-model aggregate (Fig. 2). On anchored issues MDN beats APN at every scale: +0.067 (E2B), +0.095 (E4B, CI +0.019 to +0.179) and +0.149 (31B, CI +0.072 to +0.237). On un-anchored issues E2B and E4B are *worse* than APN (−0.037, −0.042), while 31B turns positive (+0.068). Small models are useful as local verifiers around a foothold, not as searchers from scratch; at 31B the model can also search.
 
-![MDN/GDN minus APN by anchor status](figures/fig2_anchor_split.png)
+*Figure 2 (media gallery, image 2): gain of MDN/GDN over APN, split by anchor availability.*
 
 **H2: supported for small models, falsified at 31B.** GDN is non-inferior to the better of APN and MDN for E2B (0.328 vs. 0.309) and E4B (0.323 vs. 0.321). At E4B it uses 57% fewer prefill tokens and 45% less wall time than MDN; at E2B only 24% fewer tokens, because E2B MDN rarely navigates anyway. At 31B, GDN (0.354) falls 0.049 below MDN: the gate withholds navigation from a model that would have used it well. The gate opened on 57% of tasks at every scale.
 
@@ -105,7 +102,7 @@ On Acc@5, two comparisons survive Holm correction: 31B MDN (13 wins / 1 loss vs.
 
 **Audit of the official graph** (no LLM; Fig. 3). 448 of 499 gold symbols (90%) exist as nodes. **65 of 129 issues contain no identifier matching any node.** Only 45 gold symbols sit at hop 0 from an anchor, and 236 of 499 are unreachable within 8 hops. The graph has one edge type (`calls`), so imports, inheritance and data flow are not navigable.
 
-![Hop distance from anchors to gold](figures/fig3_hops.png)
+*Figure 3 (media gallery, image 3): hop distance from issue anchors to gold symbols.*
 
 ## 7. Failure analysis
 
@@ -125,3 +122,6 @@ Who should walk the code graph depends on who is walking. Gemma 4 E2B and E4B na
 
 ## References
 [1] Ouyang et al. RepoGraph. ICLR 2025, arXiv:2410.14684. [2] Liu et al. CodexGraph. arXiv:2408.03910. [3] Chen et al. LocAgent. ACL 2025, arXiv:2503.09089. [4] Seddik et al. ARISE. arXiv:2605.03117. [5] Tao et al. Code Graph Model. NeurIPS 2025, arXiv:2505.16901. [6] Zhang et al. One Tool Is Enough (RepoNavigator). arXiv:2512.20957. [7] Jiang et al. CoSIL. arXiv:2503.22424. [8] Yu et al. OrcaLoca. ICML 2025, arXiv:2502.00350. [9] GraphLocator. FSE 2026, arXiv:2512.22469. [10] Hu et al. LARGER. arXiv:2605.16352. [11] Zhang et al. RepoAtlas. arXiv:2609.16936. [12] Volpini & Raad. RLM-on-KG. arXiv:2604.17056. [13] Kon et al. SWE-Protégé. arXiv:2602.22124. [14] Lindenbauer et al. The Complexity Trap. arXiv:2508.21433. [15] Fan et al. Harness Design for Coding Agents. arXiv:2609.20804. [16] Xia et al. Agentless. arXiv:2407.01489. [17] Jimenez et al. SWE-bench. ICLR 2024, arXiv:2310.06770. [18] Markowitz et al. Google – The Gemma 4 Developer Agent Paper Track. Kaggle, 2026.
+
+
+**Code, data-download scripts, per-task results and pre-registration:** https://github.com/satiricalguru/Gemma-graph-nav
