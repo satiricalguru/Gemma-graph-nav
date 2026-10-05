@@ -12,3 +12,4 @@ results/runs_discarded/
 results/kaggle/
 results/kaggle_v2/
 results/kaggle31b/
+kaggle/kernel_*/run_*.py

@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Generates kaggle/kernel_31b/{run_31b.py, kernel-metadata.json}: a private Kaggle script that
-serves gemma-4-31b-it-qat-w4a16-ct with vLLM on L4x4 (official wheelhouse + adk_submission) and
+"""Generates kaggle/kernel_<name>/{run_<name>.py, kernel-metadata.json}: a private Kaggle script that
+serves a google/gemma-4 "other" variation (default gemma-4-31b-it-qat-w4a16-ct) with vLLM on L4x4 (official wheelhouse + adk_submission) and
 runs scripts/run_experiment.py with GGD_BACKEND=openai. The repo code, tuning files and the
 derived label cache are embedded as a base64 tarball (the generated file is git-ignored because
 labels derive from competition data).
 
 Usage:
-  scripts/make_kaggle_kernel.py --user <kaggle_username> --setup-from <official getting-started .ipynb>
+  scripts/make_kaggle_kernel.py --user <kaggle_username> --setup-from <official getting-started .ipynb> \
+      [--slug gemma-4-12b-it-qat-w4a16-ct --ver 2 --name 12b]
   uvx --from kaggle kaggle kernels push -p kaggle/kernel_31b
   uvx --from kaggle kaggle kernels output <user>/ggd-delegation-gemma4-31b -p results/kaggle
 """
@@ -35,7 +36,7 @@ off = WORK / "data" / "official"
 if not off.exists():
     off.symlink_to("/kaggle/input/competitions/gemma-4-developer-agent")
 
-MODEL_PATH = Path("/kaggle/input/models/google/gemma-4/other/gemma-4-31b-it-qat-w4a16-ct/2")
+MODEL_PATH = Path("/kaggle/input/models/google/gemma-4/other/{slug}/{ver}")
 gpu_count = torch.cuda.device_count()
 cfg = VllmConfig(model=str(MODEL_PATH), port=8000, host="127.0.0.1", tool_call_parser="gemma4",
                  reasoning_parser="gemma4", max_model_len=32768, dtype="bfloat16",
@@ -54,8 +55,8 @@ for method, budget in {methods}:
     if time.time() > deadline:
         break
     subprocess.run([sys.executable, "scripts/run_experiment.py", "--method", method, "--cv",
-                    "--budget", str(budget), "--tag", "kaggle31b"], cwd=WORK, env=env)
-subprocess.run(["tar", "czf", "/kaggle/working/results_31b.tgz", "-C", str(WORK), "results/runs"])
+                    "--budget", str(budget), "--tag", "{tag}"], cwd=WORK, env=env)
+subprocess.run(["tar", "czf", "/kaggle/working/results_{tag}.tgz", "-C", str(WORK), "results/runs"])
 print("done")
 '''
 
@@ -64,6 +65,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--user", required=True)
     ap.add_argument("--setup-from", required=True, help="official getting-started notebook (.ipynb)")
+    ap.add_argument("--slug", default="gemma-4-31b-it-qat-w4a16-ct", help="google/gemma-4 'other' variation")
+    ap.add_argument("--ver", default="2")
+    ap.add_argument("--name", default="31b", help="short name used in kernel id, tag and output file")
     args = ap.parse_args()
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w:gz") as tf:
@@ -73,21 +77,23 @@ def main():
     setup_cell = "".join(next(c for c in nb["cells"] if c["cell_type"] == "code")["source"])
     script = ("# Gemma 4 31B localization runs (E2) for 'Who Should Walk the Graph?'\n" + setup_cell +
               BODY.replace("{payload}", base64.b64encode(buf.getvalue()).decode())
-                  .replace("{methods}", repr(METHODS)))
-    out = ROOT / "kaggle" / "kernel_31b"
+                  .replace("{methods}", repr(METHODS))
+                  .replace("{slug}", args.slug).replace("{ver}", args.ver)
+                  .replace("{tag}", f"kaggle{args.name}"))
+    out = ROOT / "kaggle" / f"kernel_{args.name}"
     out.mkdir(parents=True, exist_ok=True)
-    (out / "run_31b.py").write_text(script)
-    meta = {"id": f"{args.user}/ggd-delegation-gemma4-31b", "title": "ggd-delegation-gemma4-31b",
-            "code_file": "run_31b.py", "language": "python", "kernel_type": "script",
+    (out / f"run_{args.name}.py").write_text(script)
+    meta = {"id": f"{args.user}/ggd-delegation-gemma4-{args.name}", "title": f"ggd-delegation-gemma4-{args.name}",
+            "code_file": f"run_{args.name}.py", "language": "python", "kernel_type": "script",
             "is_private": True, "enable_gpu": True, "enable_tpu": False, "enable_internet": False,
             "dataset_sources": ["metric/gemma-4-developer-agent-wheelhouse"],
             "competition_sources": ["gemma-4-developer-agent"],
-            "model_sources": ["google/gemma-4/Other/gemma-4-31b-it-qat-w4a16-ct/2"],
+            "model_sources": [f"google/gemma-4/Other/{args.slug}/{args.ver}"],
             "kernel_sources": [], "machine_shape": "NvidiaL4",
             # pinned like the official notebook: the wheelhouse is cp312; the latest image is py3.13
             "docker_image": "gcr.io/kaggle-private-byod/python@sha256:37c64f7dd9c54116ecd1bcc88817c5469b88387388fade02bfa8bf3fc647d461"}
     (out / "kernel-metadata.json").write_text(json.dumps(meta, indent=2))
-    print(f"wrote {out}/run_31b.py ({len(script)//1024} KB)")
+    print(f"wrote {out}/run_{args.name}.py ({len(script)//1024} KB)")
 
 
 if __name__ == "__main__":

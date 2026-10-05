@@ -1,0 +1,23 @@
+{
+  "id": "satiricalguru/ggd-delegation-gemma4-12b",
+  "title": "ggd-delegation-gemma4-12b",
+  "code_file": "run_12b.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": false,
+  "dataset_sources": [
+    "metric/gemma-4-developer-agent-wheelhouse"
+  ],
+  "competition_sources": [
+    "gemma-4-developer-agent"
+  ],
+  "model_sources": [
+    "google/gemma-4/Other/gemma-4-12b-it-qat-w4a16-ct/2"
+  ],
+  "kernel_sources": [],
+  "machine_shape": "NvidiaL4",
+  "docker_image": "gcr.io/kaggle-private-byod/python@sha256:37c64f7dd9c54116ecd1bcc88817c5469b88387388fade02bfa8bf3fc647d461"
+}
