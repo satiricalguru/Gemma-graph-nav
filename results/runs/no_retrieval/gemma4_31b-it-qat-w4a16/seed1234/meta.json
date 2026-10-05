@@ -1,0 +1,35 @@
+{
+  "method": "no_retrieval",
+  "args": {
+    "method": "no_retrieval",
+    "budget": 8,
+    "tau": 0.85,
+    "hops": 1,
+    "apn": "{}",
+    "no_containment": false,
+    "repos": "",
+    "limit": 0,
+    "bm25_search": false,
+    "tag": "kaggle31b",
+    "cv": true
+  },
+  "git_commit": "",
+  "prompt_version": "v1",
+  "started_utc": "2026-10-04T22:09:51Z",
+  "platform": "Linux-6.18.48+-x86_64-with-glibc2.35",
+  "machine": "x86_64",
+  "tasks_sha256": "e4b3fd60f69dbc2b9213e54eeb9636db78aefe92c1d06269d73d9f5f8f3c8ad6",
+  "model": {
+    "backend": "openai",
+    "name": "/kaggle/input/models/google/gemma-4/other/gemma-4-31b-it-qat-w4a16-ct/2",
+    "host": "http://127.0.0.1:8000",
+    "num_ctx": 32768,
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "seed": 1234,
+    "num_predict": 2048,
+    "think": false,
+    "keep_alive": "30m"
+  },
+  "ollama_error": "HTTP Error 404: Not Found"
+}

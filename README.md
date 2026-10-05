@@ -6,11 +6,11 @@
 
 ### Should a small LLM navigate your code graph, or should the graph navigate for it?
 
-**A controlled study of code-graph navigation for small Gemma 4 agents, run entirely on a 16 GB MacBook.**
+**A controlled study of code-graph navigation across the Gemma 4 scale ladder: E2B and E4B on a 16 GB MacBook, 31B on Kaggle.**
 
 [![License](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](LICENSE)
 ![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)
-![Model](https://img.shields.io/badge/model-Gemma_4_E2B_%7C_E4B-4285F4?logo=google&logoColor=white)
+![Model](https://img.shields.io/badge/model-Gemma_4_E2B_%7C_E4B_%7C_31B-4285F4?logo=google&logoColor=white)
 ![Runs on](https://img.shields.io/badge/runs_on-Ollama_%C2%B7_M2_16GB-black?logo=apple)
 ![Kaggle](https://img.shields.io/badge/Kaggle-Gemma_4_Developer_Agent_Paper_Track-20BEFF?logo=kaggle&logoColor=white)
 
@@ -26,18 +26,20 @@ Coding agents increasingly use **code graphs** (who calls whom) to find the code
 
 On a laptop, every navigation step of a small model costs seconds. So we asked:
 
-> **For a 2–4B model, is it better to let the model walk the graph, let a cheap graph algorithm do it, or decide case by case?**
+> **Is it better to let the model walk the graph, let a cheap graph algorithm do it, or decide case by case, and does the answer change with model size?**
 
-We held the graph, tools, inputs and budgets fixed and compared **6 localization methods** on the **122 official Kaggle tasks** (fastapi, rich, requests, httpx).
+We held the graph, tools, inputs and budgets fixed and compared **6 localization methods** at **3 model sizes** on the **122 official Kaggle tasks** (fastapi, rich, requests, httpx).
 
 ## 🏆 Headline findings
 
 | | Finding |
 |---|---|
-| 🎯 | **The model only helps when the issue gives it a foothold.** If the issue names a symbol that exists in the graph, Gemma 4 E4B beats the graph algorithm by **+9.5 points** of Recall@5 (95% CI +1.9 to +17.9). If not, it does **worse** (−4.2). |
-| 🚦 | **Gated delegation wins.** Run the free algorithm first and call the LLM only when the algorithm is unsure. This scores the **best Recall@5 at both sizes** and uses **57% fewer tokens** than letting E4B navigate everything. |
-| 🕳️ | **Half the issues give a graph nothing to grab.** 65 of 129 official issues mention no identifier that matches any graph node, which caps every graph-based method on this benchmark. |
-| ❌ | **We report what failed.** Our pre-registered "the algorithm beats small models" hypothesis (H1) was *not* supported, and our uncertainty signal missed its target (AUROC 0.643 < 0.65). |
+| 📈 | **The bigger the model, the more it should navigate.** Gemma navigating the graph beats the graph algorithm by +1.7 (E2B), +2.8 (E4B) and **+11.0 points** of Recall@5 at 31B (95% CI +4.1 to +18.8; 13 wins / 1 loss on Acc@5). |
+| 🎯 | **Small models need a foothold.** When the issue names a symbol in the graph, E4B beats the algorithm by **+9.5 points**; when it doesn't, it does **worse** (−4.2). At 31B that penalty disappears. |
+| 🚦 | **Gated delegation is the best small-model localizer.** Run the free algorithm first and call the LLM only when it's unsure: best Recall@5 at E2B and E4B with up to **57% fewer tokens**. At 31B it gets in the way, so switch it off. |
+| 🧱 | **At 31B a simple two-stage pipeline wins.** The graph-free Agentless-style localizer reaches **R@5 0.444**, the best of any method, after being the worst at E2B. |
+| 🕳️ | **Half the issues give a graph nothing to grab.** 65 of 129 official issues mention no identifier that matches any graph node. |
+| ❌ | **We report what failed.** "The algorithm beats small models" (H1, first clause) and our uncertainty signal (H3, AUROC 0.643 < 0.65) both missed. |
 
 ## 📊 Results
 
@@ -56,10 +58,14 @@ We held the graph, tools, inputs and budgets fixed and compared **6 localization
 | Agentless-style | E2B | .083 | .239 | .197 | 2.0 | 29.0 |
 | Model navigates (MDN) | E2B | .168 | .309 | .254 | 2.3 | 12.6 |
 | 🚦 **Gated (GDN)** | E2B | .170 | **.328** | .271 | 1.3 | **5.5** |
-| Model navigates (MDN) | E4B | **.196** | .321 | **.279** | 6.2 | 75.1 |
-| 🚦 **Gated (GDN)** | E4B | .186 | .323 | .262 | 2.5 | 41.4 |
+| Model navigates (MDN) | E4B | .196 | .321 | .279 | 6.2 | 75.1 |
+| 🚦 **Gated (GDN)** | E4B | .186 | **.323** | .262 | 2.5 | 41.4 |
+| No retrieval | 31B | .238 | .357 | .303 | 1.0 | 4.9 |
+| Agentless-style | 31B | .290 | **.444** | **.361** | 2.0 | 6.9 |
+| Model navigates (MDN) | 31B | **.306** | .402 | .336 | 7.8 | 10.3 |
+| Gated (GDN) | 31B | .223 | .354 | .287 | 2.5 | 4.8 |
 
-<sub>122 tasks, single run, T = 0, Apple M2 16 GB, Ollama 0.35.0. R@k is the share of the functions the reference fix changes that appear in the top k. Paired, repo-clustered bootstrap CIs are in the paper; no difference survives Holm correction.</sub>
+<sub>122 tasks, single run, T = 0. E2B/E4B: Apple M2 16 GB, Ollama 0.35.0, Q4 QAT. 31B: `gemma-4-31b-it-qat-w4a16-ct`, vLLM on Kaggle L4×4 (so wall times aren't comparable across rows). R@k is the share of the functions the reference fix changes that appear in the top k. After Holm correction, 31B MDN and 31B Agentless are significantly better than the algorithm on Acc@5; the small-model differences are directional. The 31B model likely knows these public repos (no-retrieval scores 0.357), see the paper.</sub>
 
 ### 🎯 It's all about the foothold
 
@@ -70,7 +76,7 @@ We held the graph, tools, inputs and budgets fixed and compared **6 localization
   </picture>
 </p>
 
-Solid bars are issues that name a symbol in the graph; light bars are issues that don't. The model is a good **local verifier around a starting point** and a poor **searcher from scratch**.
+Solid bars are issues that name a symbol in the graph; light bars are issues that don't. E2B and E4B are good **local verifiers around a starting point** but poor **searchers from scratch**; 31B is positive on both.
 
 ### 🕸️ How far is the bug from what the issue mentions?
 
@@ -145,9 +151,10 @@ tests/          unit tests for labels, graph, ranking, metrics, stats
 <details>
 <summary><b>🚧 Limitations and what's next</b></summary>
 
-- Single run per configuration; only E2B and E4B. 12B and 31B were prepared but not run.
+- Single run per configuration; three sizes (E2B, E4B, 31B); 12B not run.
 - 122 tasks, mostly from fastapi and rich; localization only (no patch generation).
-- Next steps: 12B/31B scale points, anchor-based gating, downstream repair.
+- 31B hit the 8-call navigation budget on half the tasks, so its MDN score is likely an underestimate.
+- Next steps: 12B scale point, anchor-based gating, larger budgets at 31B, downstream repair.
 </details>
 
 ## 📜 License and data

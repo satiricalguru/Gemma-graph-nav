@@ -66,7 +66,7 @@ def fig1(models):
     methods = ["bm25", "apn_cv", "no_retrieval", "agentless", "mdn", "gdn"]
     fig, ax = plt.subplots(figsize=(7.2, 3.2), dpi=200)
     w = 0.13
-    groups = ["no LLM"] + [m.replace("gemma4_", "").replace("-it-qat", "") for m in models]
+    groups = ["no LLM"] + [m.replace("gemma4_", "").replace("-it-qat-w4a16", "").replace("-it-qat", "") for m in models]
     for gi, model in enumerate(["no_llm"] + models):
         ms = methods[:2] if model == "no_llm" else methods[2:]
         for j, m in enumerate(ms):
@@ -82,7 +82,7 @@ def fig1(models):
     h, l = ax.get_legend_handles_labels()
     seen = dict(zip(l, h))
     ax.legend(seen.values(), seen.keys(), frameon=False, fontsize=7, ncol=3, loc="upper left")
-    ax.set_ylim(0, 0.55)
+    ax.set_ylim(0, 0.6)
     style(ax)
     fig.tight_layout()
     fig.savefig(OUT / f"fig1_main{SUFFIX}.png")
@@ -104,7 +104,7 @@ def fig2(models):
                 ax.bar(x + k * 0.38, mu, 0.34, color=COLORS[m], alpha=1.0 if cond else 0.45)
                 ax.errorbar(x + k * 0.38, mu, yerr=[[mu - lo], [hi - mu]], color=INK, lw=0.8, capsize=2)
             xt.append(x + 0.19)
-            xl.append(f"{m.upper()}\n{model.replace('gemma4_', '').replace('-it-qat', '')}")
+            xl.append(f"{m.upper()}\n{model.replace('gemma4_', '').replace('-it-qat-w4a16', '').replace('-it-qat', '')}")
             x += 1.1
     ax.axhline(0, color=INK, lw=0.8)
     ax.set_xticks(xt, xl, fontsize=7)
@@ -128,7 +128,7 @@ def fig3():
 
 
 if __name__ == "__main__":
-    models = [m for m in ("gemma4_e2b-it-qat", "gemma4_e4b-it-qat", "gemma4_12b-it-qat")
+    models = [m for m in ("gemma4_e2b-it-qat", "gemma4_e4b-it-qat", "gemma4_12b-it-qat", "gemma4_31b-it-qat-w4a16")
               if (ROOT / "results/runs/mdn" / m).exists()]
     for theme in ("light", "dark"):
         set_theme(theme)

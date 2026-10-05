@@ -83,7 +83,9 @@ def main():
             "dataset_sources": ["metric/gemma-4-developer-agent-wheelhouse"],
             "competition_sources": ["gemma-4-developer-agent"],
             "model_sources": ["google/gemma-4/Other/gemma-4-31b-it-qat-w4a16-ct/2"],
-            "kernel_sources": [], "machine_shape": "NvidiaL4"}
+            "kernel_sources": [], "machine_shape": "NvidiaL4",
+            # pinned like the official notebook: the wheelhouse is cp312; the latest image is py3.13
+            "docker_image": "gcr.io/kaggle-private-byod/python@sha256:37c64f7dd9c54116ecd1bcc88817c5469b88387388fade02bfa8bf3fc647d461"}
     (out / "kernel-metadata.json").write_text(json.dumps(meta, indent=2))
     print(f"wrote {out}/run_31b.py ({len(script)//1024} KB)")
 

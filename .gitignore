@@ -9,3 +9,6 @@ results/runs_discarded/
 results/*.err
 results/queue_main.log
 results/runs_discarded/
+results/kaggle/
+results/kaggle_v2/
+results/kaggle31b/

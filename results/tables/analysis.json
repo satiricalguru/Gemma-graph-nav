@@ -1,4 +1,43 @@
 {
+  "agentless|gemma4_31b-it-qat-w4a16": {
+    "failures_R@5=0": {
+      "no_anchor_wrong_start": 30,
+      "never_reached_gold": 13,
+      "gold_not_in_graph": 5
+    },
+    "n_fail": 48,
+    "behaviour": {
+      "zero_tool_call_rate": 1.0,
+      "mean_tool_calls": 0.0,
+      "invalid_call_rate": 0.0,
+      "stop_reasons": {
+        "done": 122
+      },
+      "tool_mix": "see private logs"
+    },
+    "slices": {
+      "anchored": {
+        "n": 63,
+        "R@5": 0.5843613500730079,
+        "APN_R@5": 0.4195685226657265,
+        "delta_vs_apn": 0.16479282740728143,
+        "ci95": [
+          0.06155737126625631,
+          0.27063834950175925
+        ]
+      },
+      "no_anchor": {
+        "n": 59,
+        "R@5": 0.29339031966150614,
+        "APN_R@5": 0.15716486902927582,
+        "delta_vs_apn": 0.1362254506322303,
+        "ci95": [
+          0.05988700564971751,
+          0.22033898305084745
+        ]
+      }
+    }
+  },
   "agentless|gemma4_e2b-it-qat": {
     "failures_R@5=0": {
       "never_reached_gold": 27,
@@ -34,6 +73,50 @@
         "ci95": [
           -0.1271186440677966,
           -0.0042372881355932195
+        ]
+      }
+    }
+  },
+  "gdn|gemma4_31b-it-qat-w4a16": {
+    "failures_R@5=0": {
+      "never_reached_gold": 20,
+      "budget_or_empty_final": 13,
+      "gold_not_in_graph": 5,
+      "no_anchor_wrong_start": 21,
+      "visited_gold_but_not_ranked": 2
+    },
+    "n_fail": 61,
+    "behaviour": {
+      "zero_tool_call_rate": 0.4344262295081967,
+      "mean_tool_calls": 2.0163934426229506,
+      "invalid_call_rate": 0.02032520325203252,
+      "stop_reasons": {
+        "done": 53,
+        "budget": 13,
+        "final": 54,
+        "final_empty": 2
+      },
+      "tool_mix": "see private logs"
+    },
+    "slices": {
+      "anchored": {
+        "n": 63,
+        "R@5": 0.45660555970276345,
+        "APN_R@5": 0.4195685226657265,
+        "delta_vs_apn": 0.03703703703703704,
+        "ci95": [
+          0.0,
+          0.08465608465608465
+        ]
+      },
+      "no_anchor": {
+        "n": 59,
+        "R@5": 0.24362572455792797,
+        "APN_R@5": 0.15716486902927582,
+        "delta_vs_apn": 0.08646085552865214,
+        "ci95": [
+          0.029560129136400323,
+          0.15748587570621467
         ]
       }
     }
@@ -130,6 +213,49 @@
       }
     }
   },
+  "mdn|gemma4_31b-it-qat-w4a16": {
+    "failures_R@5=0": {
+      "budget_or_empty_final": 42,
+      "visited_gold_but_not_ranked": 4,
+      "gold_not_in_graph": 5,
+      "no_anchor_wrong_start": 7,
+      "never_reached_gold": 2
+    },
+    "n_fail": 60,
+    "behaviour": {
+      "zero_tool_call_rate": 0.0,
+      "mean_tool_calls": 7.065573770491803,
+      "invalid_call_rate": 0.02668213457076566,
+      "stop_reasons": {
+        "budget": 62,
+        "final": 59,
+        "final_empty": 1
+      },
+      "tool_mix": "see private logs"
+    },
+    "slices": {
+      "anchored": {
+        "n": 63,
+        "R@5": 0.5685314242545951,
+        "APN_R@5": 0.4195685226657265,
+        "delta_vs_apn": 0.1489629015888687,
+        "ci95": [
+          0.07235634019689748,
+          0.23650467268327138
+        ]
+      },
+      "no_anchor": {
+        "n": 59,
+        "R@5": 0.22496147919876736,
+        "APN_R@5": 0.15716486902927582,
+        "delta_vs_apn": 0.06779661016949153,
+        "ci95": [
+          -0.007062146892655366,
+          0.14689265536723162
+        ]
+      }
+    }
+  },
   "mdn|gemma4_e2b-it-qat": {
     "failures_R@5=0": {
       "never_reached_gold": 20,
@@ -213,6 +339,45 @@
         "ci95": [
           -0.11440677966101695,
           0.022598870056497175
+        ]
+      }
+    }
+  },
+  "no_retrieval|gemma4_31b-it-qat-w4a16": {
+    "failures_R@5=0": {
+      "no_anchor_wrong_start": 40,
+      "never_reached_gold": 19,
+      "gold_not_in_graph": 5
+    },
+    "n_fail": 64,
+    "behaviour": {
+      "zero_tool_call_rate": 1.0,
+      "mean_tool_calls": 0.0,
+      "invalid_call_rate": 0.0,
+      "stop_reasons": {
+        "done": 122
+      },
+      "tool_mix": "see private logs"
+    },
+    "slices": {
+      "anchored": {
+        "n": 63,
+        "R@5": 0.4919272399987627,
+        "APN_R@5": 0.4195685226657265,
+        "delta_vs_apn": 0.07235871733303623,
+        "ci95": [
+          -0.016177437869785635,
+          0.16528915064886102
+        ]
+      },
+      "no_anchor": {
+        "n": 59,
+        "R@5": 0.21366204417051873,
+        "APN_R@5": 0.15716486902927582,
+        "delta_vs_apn": 0.05649717514124294,
+        "ci95": [
+          -0.018361581920903952,
+          0.13700564971751414
         ]
       }
     }
