@@ -77,6 +77,49 @@
       }
     }
   },
+  "gdn|gemma4_12b-it-qat": {
+    "failures_R@5=0": {
+      "never_reached_gold": 19,
+      "budget_or_empty_final": 42,
+      "tool_misuse": 4,
+      "gold_not_in_graph": 5,
+      "no_anchor_wrong_start": 1
+    },
+    "n_fail": 71,
+    "behaviour": {
+      "zero_tool_call_rate": 0.4344262295081967,
+      "mean_tool_calls": 2.2540983606557377,
+      "invalid_call_rate": 0.16363636363636364,
+      "stop_reasons": {
+        "done": 53,
+        "budget": 64,
+        "final": 5
+      },
+      "tool_mix": "see private logs"
+    },
+    "slices": {
+      "anchored": {
+        "n": 63,
+        "R@5": 0.43544153853874235,
+        "APN_R@5": 0.4195685226657265,
+        "delta_vs_apn": 0.015873015873015872,
+        "ci95": [
+          0.0,
+          0.047619047619047616
+        ]
+      },
+      "no_anchor": {
+        "n": 59,
+        "R@5": 0.15716486902927582,
+        "APN_R@5": 0.15716486902927582,
+        "delta_vs_apn": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    }
+  },
   "gdn|gemma4_31b-it-qat-w4a16": {
     "failures_R@5=0": {
       "never_reached_gold": 20,
@@ -209,6 +252,45 @@
         "ci95": [
           -0.012711864406779662,
           0.07062146892655367
+        ]
+      }
+    }
+  },
+  "mdn|gemma4_12b-it-qat": {
+    "failures_R@5=0": {
+      "budget_or_empty_final": 69,
+      "gold_not_in_graph": 5
+    },
+    "n_fail": 74,
+    "behaviour": {
+      "zero_tool_call_rate": 0.0,
+      "mean_tool_calls": 7.926229508196721,
+      "invalid_call_rate": 0.10858324715615306,
+      "stop_reasons": {
+        "budget": 118,
+        "final": 4
+      },
+      "tool_mix": "see private logs"
+    },
+    "slices": {
+      "anchored": {
+        "n": 63,
+        "R@5": 0.42300256943781467,
+        "APN_R@5": 0.4195685226657265,
+        "delta_vs_apn": 0.0034340467720882033,
+        "ci95": [
+          -0.07691350551520043,
+          0.08055555555555556
+        ]
+      },
+      "no_anchor": {
+        "n": 59,
+        "R@5": 0.14445300462249616,
+        "APN_R@5": 0.15716486902927582,
+        "delta_vs_apn": -0.012711864406779662,
+        "ci95": [
+          -0.07627118644067797,
+          0.046610169491525424
         ]
       }
     }

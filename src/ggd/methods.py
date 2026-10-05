@@ -23,7 +23,7 @@ from .metrics import hop_distances
 from .tools import TOOL_SCHEMAS, ToolBox
 
 K_OUT = 10
-PROMPT_VERSION = "v1"
+PROMPT_VERSION = "v2"  # v2: explicit FINAL nudge at budget exhaustion (all reported runs used v1)
 
 
 @dataclass
@@ -129,6 +129,11 @@ def run_navigator(g, issue, llm: LLM, budget: int = 8, seed_list: list[str] | No
     res = Result(name, [])
     final = None
     while True:
+        if len(tb.calls) >= budget and msgs[-1]["role"] == "tool":
+            # v2 fix: without an explicit instruction some backends (Gemma 4 12B on Ollama) return an
+            # empty message once tools are withdrawn, which silently degrades the result to the BM25 fallback.
+            msgs.append({"role": "user", "content": "Tool budget exhausted. Reply now with exactly one line: "
+                         "FINAL: <id1>, <id2>, ..."})
         r = llm.chat(msgs, tools=TOOL_SCHEMAS if len(tb.calls) < budget else None)
         res.context_chars += sum(len(m.get("content") or "") for m in msgs)
         res.llm_calls += 1

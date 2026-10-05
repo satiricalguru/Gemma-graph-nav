@@ -41,7 +41,7 @@ gpu_count = torch.cuda.device_count()
 cfg = VllmConfig(model=str(MODEL_PATH), port=8000, host="127.0.0.1", tool_call_parser="gemma4",
                  reasoning_parser="gemma4", max_model_len=32768, dtype="bfloat16",
                  gpu_memory_utilization=0.90, enable_auto_tool_choice=True,
-                 tensor_parallel_size=4 if gpu_count >= 4 else max(gpu_count, 1), startup_timeout=60 * 20)
+                 tensor_parallel_size={tp}, startup_timeout=60 * 20)
 server = VllmServer(cfg, adapter_manifest=[])
 server.start()
 with urllib.request.urlopen("http://127.0.0.1:8000/v1/models") as r:
@@ -68,6 +68,8 @@ def main():
     ap.add_argument("--slug", default="gemma-4-31b-it-qat-w4a16-ct", help="google/gemma-4 'other' variation")
     ap.add_argument("--ver", default="2")
     ap.add_argument("--name", default="31b", help="short name used in kernel id, tag and output file")
+    ap.add_argument("--tp", default="4 if gpu_count >= 4 else max(gpu_count, 1)",
+                    help="vLLM tensor_parallel_size expression; 12B QAT needs 1 (TP=4 fails: hidden_size 3840 vs 256)")
     args = ap.parse_args()
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w:gz") as tf:
@@ -78,7 +80,7 @@ def main():
     script = ("# Gemma 4 31B localization runs (E2) for 'Who Should Walk the Graph?'\n" + setup_cell +
               BODY.replace("{payload}", base64.b64encode(buf.getvalue()).decode())
                   .replace("{methods}", repr(METHODS))
-                  .replace("{slug}", args.slug).replace("{ver}", args.ver)
+                  .replace("{tp}", args.tp).replace("{slug}", args.slug).replace("{ver}", args.ver)
                   .replace("{tag}", f"kaggle{args.name}"))
     out = ROOT / "kaggle" / f"kernel_{args.name}"
     out.mkdir(parents=True, exist_ok=True)

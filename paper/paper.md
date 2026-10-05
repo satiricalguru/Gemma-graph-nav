@@ -3,7 +3,7 @@
 
 ## Abstract
 
-Repository-level coding agents increasingly navigate code graphs with LLM-driven tools, but every published system lets the model drive and reports one scaffold at large scale. It is unknown whether small local models should navigate at all. We run a controlled study on the official Gemma 4 Developer Agent graphs (122 Python issues from fastapi, rich, requests and httpx). All methods share the same graph, anchors, candidate set and output format. We compare a zero-LLM navigator (personalized PageRank seeded from issue identifiers, APN), Gemma navigating the same graph with the competition's tool semantics (MDN), gated delegation (GDN: APN first, LLM only when APN is uncertain), and four baselines, at three scales: Gemma 4 E2B and E4B on an Apple M2 laptop and the competition's 31B model on Kaggle L4×4. Our pre-registered hypothesis that the algorithm beats small models was **not** supported, but its scale clause was. The advantage of model-driven navigation over APN grows from +0.017 (E2B) to +0.028 (E4B) to **+0.110 Recall@5 at 31B** (95% CI +0.041 to +0.188; Acc@5 McNemar 13 wins / 1 loss, Holm-adjusted p ≈ 0.02). Small models help only when the issue names a symbol in the graph (E4B: +0.095 on anchored issues, −0.042 otherwise); at 31B that penalty disappears. GDN gives the best Recall@5 for E2B and E4B at up to 57% fewer tokens than MDN, but loses to MDN at 31B. A graph audit shows half the official issues name no graph symbol at all. Code, prompts, per-task results and statistics are released (Apache-2.0).
+Repository-level coding agents increasingly navigate code graphs with LLM-driven tools, but every published system lets the model drive and reports one scaffold at large scale. It is unknown whether small local models should navigate at all. We run a controlled study on the official Gemma 4 Developer Agent graphs (122 Python issues from fastapi, rich, requests and httpx). All methods share the same graph, anchors, candidate set and output format. We compare a zero-LLM navigator (personalized PageRank seeded from issue identifiers, APN), Gemma navigating the same graph with the competition's tool semantics (MDN), gated delegation (GDN: APN first, LLM only when APN is uncertain), and four baselines, at four scales: Gemma 4 E2B, E4B and 12B on an Apple M2 laptop and the competition's 31B model on Kaggle L4×4. Our pre-registered hypothesis that the algorithm beats small models was **not** supported, but its scale clause was. The advantage of model-driven navigation over APN grows from +0.017 (E2B) to +0.028 (E4B) to **+0.110 Recall@5 at 31B** (95% CI +0.041 to +0.188; Acc@5 McNemar 13 wins / 1 loss, Holm-adjusted p ≈ 0.02). Small models help only when the issue names a symbol in the graph (E4B: +0.095 on anchored issues, −0.042 otherwise); at 31B that penalty disappears. GDN gives the best Recall@5 for E2B and E4B at up to 57% fewer tokens than MDN, but loses to MDN at 31B. We also report a harness defect found after the runs: when the tool budget ran out, the final turn carried no explicit instruction, and 12B (118/122 tasks) and 31B (62/122) often replied with nothing, falling back to BM25. Their MDN scores are therefore lower bounds. A graph audit shows half the official issues name no graph symbol at all. Code, prompts, per-task results and statistics are released (Apache-2.0).
 
 ## 1. Introduction
 
@@ -18,7 +18,7 @@ We ask: **for a fixed code graph, how should navigation be split between an algo
 **H4** (compute-permitting) downstream repair improves.
 
 **Contributions.**
-(1) A controlled delegation study that holds graph, tools, anchors, candidates and budgets fixed across seven methods and three Gemma 4 scales, with repo-held-out tuning and paired, repo-clustered statistics.
+(1) A controlled delegation study that holds graph, tools, anchors, candidates and budgets fixed across seven methods and four Gemma 4 scales, with repo-held-out tuning and paired, repo-clustered statistics.
 (2) A scale-dependent answer. Small models are useful navigators only from a *foothold* (a graph symbol named in the issue). At 31B the model beats the algorithm everywhere, and the advantage grows sixfold from E2B.
 (3) Gated delegation: a training-free policy that is the best small-model localizer at roughly half the cost, together with evidence that it should be switched off for large models.
 (4) An audit of the official competition graph (gold coverage, anchor availability, hop distances) usable by any participant as a ceiling estimate.
@@ -52,19 +52,19 @@ We report failed hypotheses (H1's first clause, H3, H2 at 31B) alongside those t
 | | |
 |---|---|
 | Data | Official training split: 129 tasks, 122 scored (67 fastapi, 48 rich, 13 requests, 1 httpx); graphs and embeddings as distributed |
-| Local models | `gemma4:e2b-it-qat`, `gemma4:e4b-it-qat` (Ollama 0.35.0, Q4 QAT) on an Apple M2, 16 GB |
+| Local models | `gemma4:e2b-it-qat`, `gemma4:e4b-it-qat`, `gemma4:12b-it-qat` (Ollama 0.35.0, Q4 QAT) on an Apple M2, 16 GB |
 | Cloud model | `gemma-4-31b-it-qat-w4a16-ct` (the competition model), vLLM 0.19.1 via the official harness wheels, Kaggle L4×4 (96 GB) |
 | Decoding | T = 0, seed 1234, thinking off; identical prompts and code on both backends |
 | Metrics | Function-level Recall@k (share of gold symbols in top-k), Acc@5 (all gold in top-5), LLM calls, tool calls, invalid calls, wall time |
-| Statistics | Paired per task vs. APN-CV; 10k-resample bootstrap clustered by repository; exact McNemar on Acc@5; Holm correction across all 10 comparisons |
+| Statistics | Paired per task vs. APN-CV; 10k-resample bootstrap clustered by repository; exact McNemar on Acc@5; Holm correction across all 12 comparisons |
 
-**Not run.** Gemma 4 12B; Agentless and no-retrieval for E4B; downstream repair (H4); the external-benchmark experiment.
+**Not run.** Agentless and no-retrieval for E4B and 12B; downstream repair (H4); the external-benchmark experiment.
 
 ## 5. Results
 
 ![Recall@5 by method and model](figures/fig1_main.png)
 
-**Table 1.** Localization on 122 tasks (single run, T = 0). Δ is paired versus APN-CV with a 95% repo-clustered bootstrap CI. Wall time is hardware-specific (M2 for E2B/E4B, L4×4 for 31B).
+**Table 1.** Localization on 122 tasks (single run, T = 0). Δ is paired versus APN-CV with a 95% repo-clustered bootstrap CI. Wall time is hardware-specific (M2 for E2B/E4B/12B, L4×4 for 31B). † = most MDN runs ended at the tool budget with an empty reply (see §7); a lower bound.
 
 | Method | Model | R@1 | R@5 | Acc@5 | LLM calls | Tool calls | Prefill tok. | s/task | ΔR@5 vs APN-CV [95% CI] |
 |---|---|---|---|---|---|---|---|---|---|
@@ -76,14 +76,16 @@ We report failed hypotheses (H1's first clause, H3, H2 at 31B) alongside those t
 | **GDN** | E2B | .170 | .328 | .271 | 1.3 | 0.8 | 1,499 | 5.5 | +.035 [+.000, +.071] |
 | MDN | E4B | .196 | .321 | .279 | 6.2 | 4.5 | 8,728 | 75.1 | +.028 [−.045, +.119] |
 | **GDN** | E4B | .186 | .323 | .262 | 2.5 | 1.8 | 3,777 | 41.4 | +.031 [+.000, +.083] |
+| MDN† | 12B | .090 | .288 | .230 | 9.0 | 7.9 | 15,739 | 199.1 | −.004 [−.060, +.050] |
+| GDN† | 12B | .142 | .301 | .246 | 2.5 | 2.3 | 3,587 | 56.4 | +.008 [+.000, +.030] |
 | No retrieval | 31B | .238 | .357 | .303 | 1.0 | 0 | 3,842 | 4.9 | +.065 [−.031, +.144] |
 | Agentless-style | 31B | .290 | **.444** | **.361** | 2.0 | 0 | 5,994 | 6.9 | +.151 [+.000, +.252] |
-| MDN | 31B | **.306** | .402 | .336 | 7.8 | 7.1 | 13,936 | 10.3 | +.110 [+.041, +.188] |
+| MDN† | 31B | **.306** | .402 | .336 | 7.8 | 7.1 | 13,936 | 10.3 | +.110 [+.041, +.188] |
 | GDN | 31B | .223 | .354 | .287 | 2.5 | 2.0 | 3,554 | 4.8 | +.061 [+.000, +.132] |
 
-On Acc@5, two comparisons survive Holm correction: 31B MDN (13 wins / 1 loss vs. APN, adjusted p ≈ 0.017) and 31B Agentless (17/2, adjusted p ≈ 0.007). The bootstrap R@5 intervals for these exclude or touch zero, but their Holm-adjusted p-values (0.15, 0.55) do not reach significance. Every E2B/E4B difference is directional only.
+On Acc@5, two comparisons survive Holm correction: 31B MDN (13 wins / 1 loss vs. APN, adjusted p ≈ 0.020) and 31B Agentless (17/2, adjusted p ≈ 0.009). The bootstrap R@5 intervals for these exclude or touch zero, but their Holm-adjusted p-values (0.17, 0.65) do not reach significance. Every E2B/E4B difference is directional only.
 
-**H1: first clause falsified, scale clause supported.** MDN is never below APN, even at E2B. The MDN−APN gap grows monotonically with scale, from +0.017 to +0.028 to +0.110, with the 31B interval clear of zero. The answer to "who should walk the graph" flips from "it depends" at 2–4B to "the model" at 31B.
+**H1: first clause falsified, scale clause supported with a caveat.** MDN is at or above APN at E2B, E4B and 31B, and the gap grows from +0.017 to +0.028 to +0.110 (31B interval clear of zero). 12B (−0.004) breaks the monotone trend, but its MDN run is dominated by the budget-exhaustion defect (§7): 118 of 122 tasks fell back to BM25, so it measures the defect rather than navigation. The answer to "who should walk the graph" flips from "it depends" at 2–4B to "the model" at 31B.
 
 **The foothold interaction.** Splitting tasks by whether any issue identifier matches a graph node (63 anchored, 59 not) explains the small-model aggregate (Fig. 2). On anchored issues MDN beats APN at every scale: +0.067 (E2B), +0.095 (E4B, CI +0.019 to +0.179) and +0.149 (31B, CI +0.072 to +0.237). On un-anchored issues E2B and E4B are *worse* than APN (−0.037, −0.042), while 31B turns positive (+0.068). Small models are useful as local verifiers around a foothold, not as searchers from scratch; at 31B the model can also search.
 
@@ -107,7 +109,7 @@ On Acc@5, two comparisons survive Holm correction: 31B MDN (13 wins / 1 loss vs.
 
 ## 7. Failure analysis
 
-Failures are labelled automatically from logs (tasks with R@5 = 0). **E2B** issued no tool call on 59% of MDN tasks, and 27% of its calls were invalid (non-existent ids, invented edge types such as `"incoming"`). Its leading failures are a wrong start without an anchor (25) and an empty `FINAL` (17). **E4B** calls tools on 93% of tasks (4.5 calls, 10% invalid) but often over-expands without a foothold. On `fastapi_15030` it made 7 graph calls (five of them neighbour expansions) and returned an empty list. **31B** always navigates (7.1 calls, 2.7% invalid) and **hit the 8-call budget on 62 of 122 tasks**. The budget we set for small models is binding for the large one, so its MDN score is likely an underestimate.
+Failures are labelled automatically from logs (tasks with R@5 = 0). **E2B** issued no tool call on 59% of MDN tasks, and 27% of its calls were invalid (non-existent ids, invented edge types such as `"incoming"`). Its leading failures are a wrong start without an anchor (25) and an empty `FINAL` (17). **E4B** calls tools on 93% of tasks (4.5 calls, 10% invalid) but often over-expands without a foothold. On `fastapi_15030` it made 7 graph calls (five of them neighbour expansions) and returned an empty list. **12B** always navigates (7.9 calls, 11% invalid) and **hit the 8-call budget on 118 of 122 tasks**; **31B** (7.1 calls, 2.7% invalid) hit it on 62. **Harness defect.** At budget exhaustion our loop withdrew the tools and re-queried without an explicit instruction. Re-running one 12B task shows the model then returns an empty message, whereas adding "Tool budget exhausted. Reply now with FINAL: …" yields a valid answer. Every budget-stopped task therefore fell back to the BM25 ranking: 118/122 (12B MDN), 64 (12B GDN), 62 (31B MDN), 13 (31B GDN), 10 (E4B MDN), 1 (E2B MDN). The 12B and 31B MDN scores are lower bounds, and budget-stopped tasks are also the harder ones, so the two effects cannot be separated without a re-run. The fix ships as protocol v2 in the released code; all reported numbers use v1.
 
 ## 8. Discussion
 
@@ -115,7 +117,7 @@ The useful question for local agents is less "graph or no graph" than "who navig
 
 ## 9. Limitations
 
-One run per configuration (T = 0), so no seed variance. Three scales; 12B not run; Agentless and no-retrieval missing for E4B. 122 tasks drawn mostly from two repositories; the requests+httpx fold has 14 tasks. 31B results run on different hardware and serving stack (vLLM vs. Ollama) with identical code and prompts, and likely benefit from memorization of public repositories. Localization only; no repair (H4 not run). `view_symbol` replaces `read_file`. Gold labels are automatic and may over-count incidental edits.
+One run per configuration (T = 0), so no seed variance. Four scales; Agentless and no-retrieval missing for E4B and 12B. The budget-exhaustion defect (§7) makes 12B and 31B MDN lower bounds; a v2 re-run is pending. 122 tasks drawn mostly from two repositories; the requests+httpx fold has 14 tasks. 31B results run on different hardware and serving stack (vLLM vs. Ollama) with identical code and prompts, and likely benefit from memorization of public repositories. Localization only; no repair (H4 not run). `view_symbol` replaces `read_file`. Gold labels are automatic and may over-count incidental edits.
 
 ## 10. Conclusion
 
